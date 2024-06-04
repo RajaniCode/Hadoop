@@ -1,0 +1,5 @@
+hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+   -input /user/cloudera/input \
+   -output /user/cloudera/output_join \
+   -mapper /home/cloudera/Desktop/R/join1_mapper.py \
+   -reducer /home/cloudera/Desktop/R/join1_reducer.py

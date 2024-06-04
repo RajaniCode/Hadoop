@@ -1,0 +1,59 @@
+chmod +x join1_mapper.py 
+chmod +x join1_reducer.py 
+
+cat join1_File*.txt | ./join1_mapper.py | sort
+cat join1_File*.txt | ./join1_mapper.py | sort | ./join1_reducer.py
+
+hdfs dfs -ls /user/cloudera
+# hdfs dfs -rm -r -f /user/cloudera/input_join1
+hdfs dfs -mkdir /user/cloudera/input_join1
+hdfs dfs -ls /user/cloudera
+
+hdfs dfs -put /home/cloudera/Desktop/R/join1_File*.txt /user/cloudera/input_join1
+hdfs dfs -ls /user/cloudera/input_join1
+
+hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+   -input /user/cloudera/input_join1 \
+   -output /user/cloudera/output_join1 \
+   -mapper /home/cloudera/Desktop/R/join1_mapper.py \
+   -reducer /home/cloudera/Desktop/R/join1_reducer.py
+
+# hdfs dfs -rm -r -f /user/cloudera/output_join1
+hdfs dfs -ls /user/cloudera/output_join1
+
+hdfs dfs -cat /user/cloudera/output_join1/part-00000
+
+hdfs dfs -getmerge /user/cloudera/output_join1/* join1_output.txt
+
+
+
+
+chmod +x join2_mapper.py 
+chmod +x join2_reducer.py
+
+sh make_data_join2.txt
+
+cat join2_gen*.txt | ./join2_mapper.py | sort
+cat join2_gen*.txt | ./join2_mapper.py | sort | ./join2_reducer.py
+
+hdfs dfs -ls /user/cloudera
+# hdfs dfs -rm -r -f /user/cloudera/input_join2
+hdfs dfs -mkdir /user/cloudera/input_join2
+hdfs dfs -ls /user/cloudera
+
+hdfs dfs -put /home/cloudera/Desktop/R/join2_gen*.txt /user/cloudera/input_join2
+hdfs dfs -ls /user/cloudera/input_join2
+
+hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+   -input /user/cloudera/input_join2 \
+   -output /user/cloudera/output_join2 \
+   -mapper /home/cloudera/Desktop/R/join2_mapper.py \
+   -reducer /home/cloudera/Desktop/R/join2_reducer.py \
+   -numReduceTasks 1
+
+# hdfs dfs -rm -r -f /user/cloudera/output_join2
+hdfs dfs -ls /user/cloudera/output_join2
+
+hdfs dfs -cat /user/cloudera/output_join2/part-00000
+
+hdfs dfs -getmerge /user/cloudera/output_join2/* total_viewer_counts.txt

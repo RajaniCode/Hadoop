@@ -1,0 +1,166 @@
+[cloudera@quickstart R]$ hdfs dfs -ls
+Found 3 items
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:37 input
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:42 output_new
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:51 output_new_0
+[cloudera@quickstart R]$ hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+>    -input /user/cloudera/input \
+>    -output /user/cloudera/output_new_2 \
+>    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py \
+>    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py \
+>    -numReduceTasks 2
+packageJobJar: [] [/usr/jars/hadoop-streaming-2.6.0-cdh5.5.0.jar] /tmp/streamjob2422849520262932407.jar tmpDir=null
+16/05/11 01:00:41 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/11 01:00:42 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/11 01:00:44 INFO mapred.FileInputFormat: Total input paths to process : 2
+16/05/11 01:00:44 INFO mapreduce.JobSubmitter: number of splits:3
+16/05/11 01:00:44 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1462946279542_0003
+16/05/11 01:00:45 INFO impl.YarnClientImpl: Submitted application application_1462946279542_0003
+16/05/11 01:00:45 INFO mapreduce.Job: The url to track the job: http://quickstart.cloudera:8088/proxy/application_1462946279542_0003/
+16/05/11 01:00:45 INFO mapreduce.Job: Running job: job_1462946279542_0003
+16/05/11 01:00:59 INFO mapreduce.Job: Job job_1462946279542_0003 running in uber mode : false
+16/05/11 01:00:59 INFO mapreduce.Job:  map 0% reduce 0%
+16/05/11 01:01:17 INFO mapreduce.Job:  map 33% reduce 0%
+16/05/11 01:01:18 INFO mapreduce.Job:  map 67% reduce 0%
+16/05/11 01:01:19 INFO mapreduce.Job:  map 100% reduce 0%
+16/05/11 01:01:33 INFO mapreduce.Job:  map 100% reduce 100%
+16/05/11 01:01:34 INFO mapreduce.Job: Job job_1462946279542_0003 completed successfully
+16/05/11 01:01:34 INFO mapreduce.Job: Counters: 49
+	File System Counters
+		FILE: Number of bytes read=142
+		FILE: Number of bytes written=568885
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=415
+		HDFS: Number of bytes written=94
+		HDFS: Number of read operations=15
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=4
+	Job Counters 
+		Launched map tasks=3
+		Launched reduce tasks=2
+		Data-local map tasks=3
+		Total time spent by all maps in occupied slots (ms)=47189
+		Total time spent by all reduces in occupied slots (ms)=26184
+		Total time spent by all map tasks (ms)=47189
+		Total time spent by all reduce tasks (ms)=26184
+		Total vcore-seconds taken by all map tasks=47189
+		Total vcore-seconds taken by all reduce tasks=26184
+		Total megabyte-seconds taken by all map tasks=48321536
+		Total megabyte-seconds taken by all reduce tasks=26812416
+	Map-Reduce Framework
+		Map input records=2
+		Map output records=15
+		Map output bytes=100
+		Map output materialized bytes=166
+		Input split bytes=339
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=14
+		Reduce shuffle bytes=166
+		Reduce input records=15
+		Reduce output records=14
+		Spilled Records=30
+		Shuffled Maps =6
+		Failed Shuffles=0
+		Merged Map outputs=6
+		GC time elapsed (ms)=764
+		CPU time spent (ms)=14510
+		Physical memory (bytes) snapshot=1229766656
+		Virtual memory (bytes) snapshot=7883575296
+		Total committed heap usage (bytes)=1150812160
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=76
+	File Output Format Counters 
+		Bytes Written=94
+16/05/11 01:01:34 INFO streaming.StreamJob: Output directory: /user/cloudera/output_new_2
+[cloudera@quickstart R]$ hdfs dfs -ls
+Found 4 items
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:37 input
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:42 output_new
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:51 output_new_0
+drwxr-xr-x   - cloudera cloudera          0 2016-05-11 01:01 output_new_2
+[cloudera@quickstart R]$ hdfs dfs -ls /user/cloudera/output_new_2
+Found 3 items
+-rw-r--r--   1 cloudera cloudera          0 2016-05-11 01:01 /user/cloudera/output_new_2/_SUCCESS
+-rw-r--r--   1 cloudera cloudera         64 2016-05-11 01:01 /user/cloudera/output_new_2/part-00000
+-rw-r--r--   1 cloudera cloudera         30 2016-05-11 01:01 /user/cloudera/output_new_2/part-00001
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_2/_SUCCESS
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_2/part-00000
+A	1
+Another	1
+Wars	1
+a	1
+ago	1
+episode	1
+far	2
+in	1
+of	1
+time	1
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_2/part-00001
+Star	1
+away	1
+galaxy	1
+long	1
+
+[cloudera@quickstart R]$ hdfs dfs -ls /user/cloudera/output_new_0
+Found 4 items
+-rw-r--r--   1 cloudera cloudera          0 2016-05-10 03:51 /user/cloudera/output_new_0/_SUCCESS
+-rw-r--r--   1 cloudera cloudera         61 2016-05-10 03:51 /user/cloudera/output_new_0/part-00000
+-rw-r--r--   1 cloudera cloudera         39 2016-05-10 03:51 /user/cloudera/output_new_0/part-00001
+-rw-r--r--   1 cloudera cloudera          0 2016-05-10 03:51 /user/cloudera/output_new_0/part-00002
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_0/_SUCCESS
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_0/part-00000
+A	1
+long	1
+time	1
+ago	1
+in	1
+a	1
+galaxy	1
+far	1
+far	1
+away	1
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_0/part-00002
+
+
+
+
+
+
+
+[cloudera@quickstart R]$ hdfs dfs -ls /user/cloudera/output_new
+Found 2 items
+-rw-r--r--   1 cloudera cloudera          0 2016-05-10 03:42 /user/cloudera/output_new/_SUCCESS
+-rw-r--r--   1 cloudera cloudera         94 2016-05-10 03:42 /user/cloudera/output_new/part-00000
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new/_SUCCESS
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new/part-00000
+A	1
+Another	1
+Star	1
+Wars	1
+a	1
+ago	1
+away	1
+episode	1
+far	2
+galaxy	1
+in	1
+long	1
+of	1
+time	1
+
+
+
+
+
+
+
