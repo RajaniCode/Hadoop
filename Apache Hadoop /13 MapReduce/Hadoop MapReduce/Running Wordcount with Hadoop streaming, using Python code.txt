@@ -1,0 +1,430 @@
+[cloudera@quickstart R]$ python --version
+Python 2.6.6
+[cloudera@quickstart R]$ more wordcount_mapper.py
+#!/usr/bin/env python   
+#the above just indicates to use python to intepret this file
+
+# ---------------------------------------------------------------
+#This mapper code will input a line of text and output <word, 1>
+# 
+# ---------------------------------------------------------------
+
+import sys             #a python module with system functions for this OS
+
+# ------------------------------------------------------------
+#  this 'for loop' will set 'line' to an input line from system 
+#    standard input file
+# ------------------------------------------------------------
+for line in sys.stdin:  
+
+#-----------------------------------
+#sys.stdin call 'sys' to read a line from standard input, 
+# note that 'line' is a string object, ie variable, and it has methods that you 
+can apply to it,
+# as in the next line
+# ---------------------------------
+    line = line.strip()  #strip is a method, ie function, associated
+                         #  with string variable, it will strip 
+                         #   the carriage return (by default)
+    keys = line.split()  #split line at blanks (by default), 
+                         #   and return a list of keys
+    for key in keys:     #a for loop through the list of keys
+        value = 1        
+        print('{0}\t{1}'.format(key, value) ) #the {} is replaced by 0th,1st ite
+ms in format list
+                            #also, note that the Hadoop default is 'tab' separat
+es key from the value
+[cloudera@quickstart R]$ more wordcount_reducer.py
+#!/usr/bin/env python
+
+# ---------------------------------------------------------------
+#This reducer code will input a line of text and 
+#    output <word, total-count>
+# ---------------------------------------------------------------
+import sys
+
+last_key      = None              #initialize these variables
+running_total = 0
+
+# -----------------------------------
+# Loop thru file
+#  --------------------------------
+for input_line in sys.stdin:
+    input_line = input_line.strip()
+
+    # --------------------------------
+    # Get Next Word    # --------------------------------
+    this_key, value = input_line.split("\t", 1)  #the Hadoop default is tab sepa
+rates key value
+                          #the split command returns a list of strings, in this 
+case into 2 variables
+    value = int(value)           #int() will convert a string to integer (this p
+rogram does no error checking)
+ 
+    # ---------------------------------
+    # Key Check part
+    #    if this current key is same 
+    #          as the last one Consolidate
+    #    otherwise  Emit
+    # ---------------------------------
+    if last_key == this_key:     #check if key has changed ('==' is             
+                      #      logical equalilty check
+        running_total += value   # add value to running total
+
+    else:
+        if last_key:             #if this key that was just read in
+                                 #   is different, and the previous 
+                                 #   (ie last) key is not empy,
+                                 #   then output 
+                                 #   the previous <key running-count>
+            print( "{0}\t{1}".format(last_key, running_total) )
+                                 # hadoop expects tab(ie '\t') 
+                                 #    separation
+        running_total = value    #reset values
+        last_key = this_key
+
+if last_key == this_key:
+    print( "{0}\t{1}".format(last_key, running_total)) 
+[cloudera@quickstart R]$ chmod +x wordcount_mapper.py 
+[cloudera@quickstart R]$ chmod +x wordcount_reducer.py
+[cloudera@quickstart R]$ pwd
+/home/cloudera/Desktop/R
+[cloudera@quickstart R]$ echo "A long time ago in a galaxy far far away" > /home/cloudera/testfile1
+[cloudera@quickstart R]$ echo "Another episode of Star Wars" > /home/cloudera/testfile2 
+[cloudera@quickstart R]$ ls /home/cloudera/
+cloudera-manager  Downloads                   kerberos  Pictures   testfile2
+cm_api.py         eclipse                     lib       Public     Videos
+Desktop           enterprise-deployment.json  Music     Templates  workspace
+Documents         express-deployment.json     parcels   testfile1
+[cloudera@quickstart R]$ hdfs dfs -mkdir /user/cloudera/input
+[cloudera@quickstart R]$ hdfs dfs -put /home/cloudera/testfile1 /user/cloudera/input 
+[cloudera@quickstart R]$ hdfs dfs -put /home/cloudera/testfile2 /user/cloudera/input 
+[cloudera@quickstart R]$ hdfs dfs -ls /user/cloudera/input
+Found 2 items
+-rw-r--r--   1 cloudera cloudera         41 2016-05-10 03:37 /user/cloudera/input/testfile1
+-rw-r--r--   1 cloudera cloudera         29 2016-05-10 03:37 /user/cloudera/input/testfile2
+[cloudera@quickstart R]$ hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+>    -input /user/cloudera/input \
+>    -output /user/cloudera/output_new \
+>    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py \
+>    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py
+packageJobJar: [] [/usr/jars/hadoop-streaming-2.6.0-cdh5.5.0.jar] /tmp/streamjob7927325405876472157.jar tmpDir=null
+16/05/10 03:40:47 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/10 03:40:48 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/10 03:40:51 INFO mapred.FileInputFormat: Total input paths to process : 2
+16/05/10 03:40:51 INFO mapreduce.JobSubmitter: number of splits:3
+16/05/10 03:40:52 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1462875131682_0001
+16/05/10 03:40:53 INFO impl.YarnClientImpl: Submitted application application_1462875131682_0001
+16/05/10 03:40:54 INFO mapreduce.Job: The url to track the job: http://quickstart.cloudera:8088/proxy/application_1462875131682_0001/
+16/05/10 03:40:54 INFO mapreduce.Job: Running job: job_1462875131682_0001
+16/05/10 03:41:18 INFO mapreduce.Job: Job job_1462875131682_0001 running in uber mode : false
+16/05/10 03:41:18 INFO mapreduce.Job:  map 0% reduce 0%
+16/05/10 03:41:43 INFO mapreduce.Job:  map 33% reduce 0%
+16/05/10 03:41:47 INFO mapreduce.Job:  map 67% reduce 0%
+16/05/10 03:41:50 INFO mapreduce.Job:  map 100% reduce 0%
+16/05/10 03:42:24 INFO mapreduce.Job:  map 100% reduce 100%
+16/05/10 03:42:26 INFO mapreduce.Job: Job job_1462875131682_0001 completed successfully
+16/05/10 03:42:27 INFO mapreduce.Job: Counters: 49
+	File System Counters
+		FILE: Number of bytes read=136
+		FILE: Number of bytes written=455125
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=415
+		HDFS: Number of bytes written=94
+		HDFS: Number of read operations=12
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=2
+	Job Counters 
+		Launched map tasks=3
+		Launched reduce tasks=1
+		Data-local map tasks=3
+		Total time spent by all maps in occupied slots (ms)=77105
+		Total time spent by all reduces in occupied slots (ms)=36999
+		Total time spent by all map tasks (ms)=77105
+		Total time spent by all reduce tasks (ms)=36999
+		Total vcore-seconds taken by all map tasks=77105
+		Total vcore-seconds taken by all reduce tasks=36999
+		Total megabyte-seconds taken by all map tasks=78955520
+		Total megabyte-seconds taken by all reduce tasks=37886976
+	Map-Reduce Framework
+		Map input records=2
+		Map output records=15
+		Map output bytes=100
+		Map output materialized bytes=148
+		Input split bytes=339
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=14
+		Reduce shuffle bytes=148
+		Reduce input records=15
+		Reduce output records=14
+		Spilled Records=30
+		Shuffled Maps =3
+		Failed Shuffles=0
+		Merged Map outputs=3
+		GC time elapsed (ms)=950
+		CPU time spent (ms)=15550
+		Physical memory (bytes) snapshot=1007575040
+		Virtual memory (bytes) snapshot=6305648640
+		Total committed heap usage (bytes)=934281216
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=76
+	File Output Format Counters 
+		Bytes Written=94
+16/05/10 03:42:27 INFO streaming.StreamJob: Output directory: /user/cloudera/output_new
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new/part-00000
+A	1
+Another	1
+Star	1
+Wars	1
+a	1
+ago	1
+away	1
+episode	1
+far	2
+galaxy	1
+in	1
+long	1
+of	1
+time	1
+[cloudera@quickstart R]$ hdfs dfs -ls /user/cloudera/output_new 
+Found 2 items
+-rw-r--r--   1 cloudera cloudera          0 2016-05-10 03:42 /user/cloudera/output_new/_SUCCESS
+-rw-r--r--   1 cloudera cloudera         94 2016-05-10 03:42 /user/cloudera/output_new/part-00000
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new/part-00000 
+A	1
+Another	1
+Star	1
+Wars	1
+a	1
+ago	1
+away	1
+episode	1
+far	2
+galaxy	1
+in	1
+long	1
+of	1
+time	1
+[cloudera@quickstart R]$ hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar --help 
+Usage: $HADOOP_PREFIX/bin/hadoop jar hadoop-streaming.jar [options]
+Options:
+  -input          <path> DFS input file(s) for the Map step.
+  -output         <path> DFS output directory for the Reduce step.
+  -mapper         <cmd|JavaClassName> Optional. Command to be run as mapper.
+  -combiner       <cmd|JavaClassName> Optional. Command to be run as combiner.
+  -reducer        <cmd|JavaClassName> Optional. Command to be run as reducer.
+  -file           <file> Optional. File/dir to be shipped in the Job jar file.
+                  Deprecated. Use generic option "-files" instead.
+  -inputformat    <TextInputFormat(default)|SequenceFileAsTextInputFormat|JavaClassName>
+                  Optional. The input format class.
+  -outputformat   <TextOutputFormat(default)|JavaClassName>
+                  Optional. The output format class.
+  -partitioner    <JavaClassName>  Optional. The partitioner class.
+  -numReduceTasks <num> Optional. Number of reduce tasks.
+  -inputreader    <spec> Optional. Input recordreader spec.
+  -cmdenv         <n>=<v> Optional. Pass env.var to streaming commands.
+  -mapdebug       <cmd> Optional. To run this script when a map task fails.
+  -reducedebug    <cmd> Optional. To run this script when a reduce task fails.
+  -io             <identifier> Optional. Format to use for input to and output
+                  from mapper/reducer commands
+  -lazyOutput     Optional. Lazily create Output.
+  -background     Optional. Submit the job and don't wait till it completes.
+  -verbose        Optional. Print verbose output.
+  -info           Optional. Print detailed usage.
+  -help           Optional. Print help message.
+
+Generic options supported are
+-conf <configuration file>     specify an application configuration file
+-D <property=value>            use value for given property
+-fs <local|namenode:port>      specify a namenode
+-jt <local|resourcemanager:port>    specify a ResourceManager
+-files <comma separated list of files>    specify comma separated files to be copied to the map reduce cluster
+-libjars <comma separated list of jars>    specify comma separated jar files to include in the classpath.
+-archives <comma separated list of archives>    specify comma separated archives to be unarchived on the compute machines.
+
+The general command line syntax is
+bin/hadoop command [genericOptions] [commandOptions]
+
+
+For more details about these options:
+Use $HADOOP_PREFIX/bin/hadoop jar hadoop-streaming.jar -info
+[cloudera@quickstart R]$ hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+>    -input /user/cloudera/input \
+>    -output /user/cloudera/output_new_0 \
+>    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py \
+>    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py \
+>    -numReduceTasks 0
+packageJobJar: [] [/usr/jars/hadoop-streaming-2.6.0-cdh5.5.0.jar] /tmp/streamjob8517661459743801947.jar tmpDir=null
+16/05/10 03:50:59 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/10 03:51:00 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/10 03:51:02 INFO mapred.FileInputFormat: Total input paths to process : 2
+16/05/10 03:51:03 INFO mapreduce.JobSubmitter: number of splits:3
+16/05/10 03:51:03 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1462875131682_0002
+16/05/10 03:51:04 INFO impl.YarnClientImpl: Submitted application application_1462875131682_0002
+16/05/10 03:51:05 INFO mapreduce.Job: The url to track the job: http://quickstart.cloudera:8088/proxy/application_1462875131682_0002/
+16/05/10 03:51:05 INFO mapreduce.Job: Running job: job_1462875131682_0002
+16/05/10 03:51:21 INFO mapreduce.Job: Job job_1462875131682_0002 running in uber mode : false
+16/05/10 03:51:21 INFO mapreduce.Job:  map 0% reduce 0%
+16/05/10 03:51:43 INFO mapreduce.Job:  map 33% reduce 0%
+16/05/10 03:51:44 INFO mapreduce.Job:  map 100% reduce 0%
+16/05/10 03:51:46 INFO mapreduce.Job: Job job_1462875131682_0002 completed successfully
+16/05/10 03:51:47 INFO mapreduce.Job: Counters: 30
+	File System Counters
+		FILE: Number of bytes read=0
+		FILE: Number of bytes written=339996
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=415
+		HDFS: Number of bytes written=100
+		HDFS: Number of read operations=15
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=6
+	Job Counters 
+		Launched map tasks=3
+		Data-local map tasks=3
+		Total time spent by all maps in occupied slots (ms)=58988
+		Total time spent by all reduces in occupied slots (ms)=0
+		Total time spent by all map tasks (ms)=58988
+		Total vcore-seconds taken by all map tasks=58988
+		Total megabyte-seconds taken by all map tasks=60403712
+	Map-Reduce Framework
+		Map input records=2
+		Map output records=15
+		Input split bytes=339
+		Spilled Records=0
+		Failed Shuffles=0
+		Merged Map outputs=0
+		GC time elapsed (ms)=669
+		CPU time spent (ms)=8850
+		Physical memory (bytes) snapshot=605110272
+		Virtual memory (bytes) snapshot=4746612736
+		Total committed heap usage (bytes)=498597888
+	File Input Format Counters 
+		Bytes Read=76
+	File Output Format Counters 
+		Bytes Written=100
+16/05/10 03:51:47 INFO streaming.StreamJob: Output directory: /user/cloudera/output_new_0
+[cloudera@quickstart R]$ hdfs dfs -getmerge /user/cloudera/output_new_0/* wordcount_num0_output.txt 
+[cloudera@quickstart R]$ hdfs dfs -ls
+Found 3 items
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:37 input
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:42 output_new
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:51 output_new_0
+[cloudera@quickstart R]$ hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+>    -input /user/cloudera/input \
+>    -output /user/cloudera/output_new_2 \
+>    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py \
+>    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py \
+>    -numReduceTasks 2
+packageJobJar: [] [/usr/jars/hadoop-streaming-2.6.0-cdh5.5.0.jar] /tmp/streamjob2422849520262932407.jar tmpDir=null
+16/05/11 01:00:41 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/11 01:00:42 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+16/05/11 01:00:44 INFO mapred.FileInputFormat: Total input paths to process : 2
+16/05/11 01:00:44 INFO mapreduce.JobSubmitter: number of splits:3
+16/05/11 01:00:44 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1462946279542_0003
+16/05/11 01:00:45 INFO impl.YarnClientImpl: Submitted application application_1462946279542_0003
+16/05/11 01:00:45 INFO mapreduce.Job: The url to track the job: http://quickstart.cloudera:8088/proxy/application_1462946279542_0003/
+16/05/11 01:00:45 INFO mapreduce.Job: Running job: job_1462946279542_0003
+16/05/11 01:00:59 INFO mapreduce.Job: Job job_1462946279542_0003 running in uber mode : false
+16/05/11 01:00:59 INFO mapreduce.Job:  map 0% reduce 0%
+16/05/11 01:01:17 INFO mapreduce.Job:  map 33% reduce 0%
+16/05/11 01:01:18 INFO mapreduce.Job:  map 67% reduce 0%
+16/05/11 01:01:19 INFO mapreduce.Job:  map 100% reduce 0%
+16/05/11 01:01:33 INFO mapreduce.Job:  map 100% reduce 100%
+16/05/11 01:01:34 INFO mapreduce.Job: Job job_1462946279542_0003 completed successfully
+16/05/11 01:01:34 INFO mapreduce.Job: Counters: 49
+	File System Counters
+		FILE: Number of bytes read=142
+		FILE: Number of bytes written=568885
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=415
+		HDFS: Number of bytes written=94
+		HDFS: Number of read operations=15
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=4
+	Job Counters 
+		Launched map tasks=3
+		Launched reduce tasks=2
+		Data-local map tasks=3
+		Total time spent by all maps in occupied slots (ms)=47189
+		Total time spent by all reduces in occupied slots (ms)=26184
+		Total time spent by all map tasks (ms)=47189
+		Total time spent by all reduce tasks (ms)=26184
+		Total vcore-seconds taken by all map tasks=47189
+		Total vcore-seconds taken by all reduce tasks=26184
+		Total megabyte-seconds taken by all map tasks=48321536
+		Total megabyte-seconds taken by all reduce tasks=26812416
+	Map-Reduce Framework
+		Map input records=2
+		Map output records=15
+		Map output bytes=100
+		Map output materialized bytes=166
+		Input split bytes=339
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=14
+		Reduce shuffle bytes=166
+		Reduce input records=15
+		Reduce output records=14
+		Spilled Records=30
+		Shuffled Maps =6
+		Failed Shuffles=0
+		Merged Map outputs=6
+		GC time elapsed (ms)=764
+		CPU time spent (ms)=14510
+		Physical memory (bytes) snapshot=1229766656
+		Virtual memory (bytes) snapshot=7883575296
+		Total committed heap usage (bytes)=1150812160
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=76
+	File Output Format Counters 
+		Bytes Written=94
+16/05/11 01:01:34 INFO streaming.StreamJob: Output directory: /user/cloudera/output_new_2
+[cloudera@quickstart R]$ hdfs dfs -ls
+Found 4 items
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:37 input
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:42 output_new
+drwxr-xr-x   - cloudera cloudera          0 2016-05-10 03:51 output_new_0
+drwxr-xr-x   - cloudera cloudera          0 2016-05-11 01:01 output_new_2
+[cloudera@quickstart R]$ hdfs dfs -ls /user/cloudera/output_new_2
+Found 3 items
+-rw-r--r--   1 cloudera cloudera          0 2016-05-11 01:01 /user/cloudera/output_new_2/_SUCCESS
+-rw-r--r--   1 cloudera cloudera         64 2016-05-11 01:01 /user/cloudera/output_new_2/part-00000
+-rw-r--r--   1 cloudera cloudera         30 2016-05-11 01:01 /user/cloudera/output_new_2/part-00001
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_2/_SUCCESS
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_2/part-00000
+A	1
+Another	1
+Wars	1
+a	1
+ago	1
+episode	1
+far	2
+in	1
+of	1
+time	1
+[cloudera@quickstart R]$ hdfs dfs -cat /user/cloudera/output_new_2/part-00001
+Star	1
+away	1
+galaxy	1
+long	1

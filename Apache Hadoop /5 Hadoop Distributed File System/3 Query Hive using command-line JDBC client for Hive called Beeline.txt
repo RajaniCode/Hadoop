@@ -1,0 +1,12 @@
+[cloudera@quickstart ~]$ sudo -u hdfs hadoop fs -mkdir /user/hive/warehouse/original_access_logs
+[cloudera@quickstart ~]$ sudo -u hdfs hadoop fs -copyFromLocal /opt/examples/log_files/access.log.2 /user/hive/warehouse/original_access_logs
+[cloudera@quickstart ~]$ hadoop fs -ls /user/hive/warehouse/original_access_logs
+Found 1 items
+-rw-r--r--   1 hdfs hive   39593868 2016-04-21 23:58 /user/hive/warehouse/original_access_logs/access.log.2
+[cloudera@quickstart ~]$ beeline -u jdbc:hive2://quickstart:10000/default -n admin -d org.apache.hive.jdbc.HiveDriver
+Connecting to jdbc:hive2://quickstart:10000/default
+Connected to: Apache Hive (version 1.1.0-cdh5.4.2)
+Driver: Hive JDBC (version 1.1.0-cdh5.4.2)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+Beeline version 1.1.0-cdh5.4.2 by Apache Hive
+0: jdbc:hive2://quickstart:10000/default>

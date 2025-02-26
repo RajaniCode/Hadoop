@@ -1,0 +1,22 @@
+Software
+
+Windows 7+, Mac OS X 10.10+, Ubuntu 14.04+ or CentOS 6+ VirtualBox 5+, VMWare Workstation 9+ or VMWare Fusion 7+
+
+Hardware
+
+Quad Core Processor (VT-x or AMD-V support recommended)
+8 GB RAM
+20 GB disk free
+
+How to find your hardware information
+
+Windows: Open System by clicking the Start button, right-clicking Computer, and then clicking Properties
+
+Mac: Open Overview by clicking on the Apple menu and clicking “About This Mac”
+
+Most computers with 8 GB RAM purchased in the last 3 years will meet the minimum requirements.
+
+Internet Connection
+
+Access to broadband connection to download the 4 GB Cloudera QuickStart VM from: 
+http://www.cloudera.com/content/www/en-us/downloads/quickstart_vms/5-4.html

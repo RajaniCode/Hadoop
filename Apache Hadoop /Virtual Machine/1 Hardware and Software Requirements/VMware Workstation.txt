@@ -1,0 +1,7 @@
+VMware Workstation
+
+Open a Virtual Machine
+
+Browse to extracted (cloudera-quickstart-vm-5.4.2-0-vmware) folder from cloudera-quickstart-vm-5.4.2-0-vmware.zip
+
+Select cloudera-quickstart-vm-5.4.2-0-vmware.vmx [VMware virtual machine configuration (.vmx)]

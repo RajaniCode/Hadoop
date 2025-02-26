@@ -1,0 +1,63 @@
+[cloudera@quickstart ~]$ sudo -u hdfs hadoop fs -mkdir /user/hive/warehouse/original_access_logs
+[cloudera@quickstart ~]$ sudo -u hdfs hadoop fs -copyFromLocal /opt/examples/log_files/access.log.2 /user/hive/warehouse/original_access_logs
+[cloudera@quickstart ~]$ hadoop fs -ls /user/hive/warehouse/original_access_logs
+Found 1 items
+-rw-r--r--   1 hdfs hive   39593868 2016-04-21 23:58 /user/hive/warehouse/original_access_logs/access.log.2
+[cloudera@quickstart ~]$ beeline -u jdbc:hive2://quickstart:10000/default -n admin -d org.apache.hive.jdbc.HiveDriver
+Connecting to jdbc:hive2://quickstart:10000/default
+Connected to: Apache Hive (version 1.1.0-cdh5.4.2)
+Driver: Hive JDBC (version 1.1.0-cdh5.4.2)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+Beeline version 1.1.0-cdh5.4.2 by Apache Hive
+0: jdbc:hive2://quickstart:10000/default> CREATE EXTERNAL TABLE intermediate_access_logs (
+0: jdbc:hive2://quickstart:10000/default>  ip STRING,
+0: jdbc:hive2://quickstart:10000/default>  date STRING,
+0: jdbc:hive2://quickstart:10000/default>  method STRING,
+0: jdbc:hive2://quickstart:10000/default>  url STRING,
+0: jdbc:hive2://quickstart:10000/default>  http_version STRING,
+0: jdbc:hive2://quickstart:10000/default>  code1 STRING,
+0: jdbc:hive2://quickstart:10000/default>  code2 STRING,
+0: jdbc:hive2://quickstart:10000/default>  dash STRING,
+0: jdbc:hive2://quickstart:10000/default>  user_agent STRING)
+0: jdbc:hive2://quickstart:10000/default>  ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
+0: jdbc:hive2://quickstart:10000/default>  WITH SERDEPROPERTIES (
+0: jdbc:hive2://quickstart:10000/default>  'input.regex' = '([^ ]*) - - \\[([^\\]]*)\\] "([^\ ]*) ([^\ ]*) ([^\ ]*)" (\\d*) (\\d*) "([^"]*)" "([^"]*)"',
+0: jdbc:hive2://quickstart:10000/default>  'output.format.string' = "%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s"
+0: jdbc:hive2://quickstart:10000/default>  )
+0: jdbc:hive2://quickstart:10000/default>  LOCATION '/user/hive/warehouse/original_access_logs';
+No rows affected (5.826 seconds)
+0: jdbc:hive2://quickstart:10000/default> CREATE EXTERNAL TABLE tokenized_access_logs (
+0: jdbc:hive2://quickstart:10000/default>  ip STRING,
+0: jdbc:hive2://quickstart:10000/default>  date STRING,
+0: jdbc:hive2://quickstart:10000/default>  method STRING,
+0: jdbc:hive2://quickstart:10000/default>  url STRING,
+0: jdbc:hive2://quickstart:10000/default>  http_version STRING,
+0: jdbc:hive2://quickstart:10000/default>  code1 STRING,
+0: jdbc:hive2://quickstart:10000/default>  code2 STRING,
+0: jdbc:hive2://quickstart:10000/default>  dash STRING,
+0: jdbc:hive2://quickstart:10000/default>  user_agent STRING)
+0: jdbc:hive2://quickstart:10000/default>  ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+0: jdbc:hive2://quickstart:10000/default>  LOCATION '/user/hive/warehouse/tokenized_access_logs';
+No rows affected (0.69 seconds)
+0: jdbc:hive2://quickstart:10000/default> ADD JAR /usr/lib/hive/lib/hive-contrib.jar;
+No rows affected (0.003 seconds)
+0: jdbc:hive2://quickstart:10000/default> INSERT OVERWRITE TABLE tokenized_access_logs SELECT * FROM intermediate_access_logs;
+INFO  : Number of reduce tasks is set to 0 since there's no reduce operator
+WARN  : Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+INFO  : Starting Job = job_1461307724920_0001, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1461307724920_0001/
+INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1461307724920_0001
+INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+INFO  : 2016-04-22 00:14:35,834 Stage-1 map = 0%,  reduce = 0%
+INFO  : 2016-04-22 00:14:59,733 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.7 sec
+INFO  : MapReduce Total cumulative CPU time: 7 seconds 700 msec
+INFO  : Ended Job = job_1461307724920_0001
+INFO  : Stage-4 is selected by condition resolver.
+INFO  : Stage-3 is filtered out by condition resolver.
+INFO  : Stage-5 is filtered out by condition resolver.
+INFO  : Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/tokenized_access_logs/.hive-staging_hive_2016-04-22_00-14-04_644_2272810795580260422-1/-ext-10000 from hdfs://quickstart.cloudera:8020/user/hive/warehouse/tokenized_access_logs/.hive-staging_hive_2016-04-22_00-14-04_644_2272810795580260422-1/-ext-10002
+INFO  : Loading data to table default.tokenized_access_logs from hdfs://quickstart.cloudera:8020/user/hive/warehouse/tokenized_access_logs/.hive-staging_hive_2016-04-22_00-14-04_644_2272810795580260422-1/-ext-10000
+INFO  : Table default.tokenized_access_logs stats: [numFiles=1, numRows=180000, totalSize=37433868, rawDataSize=37253868]
+No rows affected (57.033 seconds)
+0: jdbc:hive2://quickstart:10000/default> !quit
+Closing: 0: jdbc:hive2://quickstart:10000/default
+[cloudera@quickstart ~]$

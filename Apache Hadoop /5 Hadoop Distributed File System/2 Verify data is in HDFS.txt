@@ -1,0 +1,6 @@
+[cloudera@quickstart ~]$ sudo -u hdfs hadoop fs -mkdir /user/hive/warehouse/original_access_logs
+[cloudera@quickstart ~]$ sudo -u hdfs hadoop fs -copyFromLocal /opt/examples/log_files/access.log.2 /user/hive/warehouse/original_access_logs
+[cloudera@quickstart ~]$ hadoop fs -ls /user/hive/warehouse/original_access_logs
+Found 1 items
+-rw-r--r--   1 hdfs hive   39593868 2016-04-21 23:58 /user/hive/warehouse/original_access_logs/access.log.2
+[cloudera@quickstart ~]$ 

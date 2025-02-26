@@ -1,0 +1,79 @@
+[cloudera@quickstart R]$ history
+    1  more wordcount_mapper.py
+    2  python --version
+    3  more wordcount_mapper.py
+    4  more wordcount_reducer.py
+    5  chmod +x wordcount_mapper.py 
+    6  chmod +x wordcount_reducer.py
+    7  pwd
+    8  echo "A long time ago in a galaxy far far away" > /home/cloudera/testfile1
+    9  echo "Another episode of Star Wars" > /home/cloudera/testfile2 
+   10  ls /home/cloudera/
+   11  hdfs dfs -mkdir /user/cloudera/input
+   12  hdfs dfs -put /home/cloudera/testfile1 /user/cloudera/input 
+   13  hdfs dfs -put /home/cloudera/testfile2 /user/cloudera/input 
+   14  hdfs dfs -ls /user/cloudera/input
+   15  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_new    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py
+   16  hdfs dfs -cat /user/cloudera/output_new/part-00000
+   17  hdfs dfs -ls /user/cloudera/output_new 
+   18  hdfs dfs -cat /user/cloudera/output_new/part-00000 
+   19  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar --help 
+   20  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_new_0    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py    -numReduceTasks 0
+   21  hdfs dfs -getmerge /user/cloudera/output_new_0/* wordcount_num0_output.txt 
+   22  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_new_2    -mapper /home/cloudera/wordcount_mapper.py    -reducer /home/cloudera/wordcount_reducer.py    -numReduceTasks 2
+   23  hdfs ls /user/cloudera/
+   24  hdfs dfs -ls
+   25  hdfs dfs -ls /user/cloudera/
+   26  hdfs dfs -ls
+   27  hdfs dfs -ls /user/cloudera/input 
+   28  hdfs dfs -cat /user/cloudera/output_new/part-00000
+   29  hdfs dfs -ls /user/cloudera/output_new 
+   30  hdfs dfs -cat /user/cloudera/output_new/part-00000
+   31  hdfs dfs -ls /user/cloudera/output_new_2
+   32  hdfs dfs -ls /user/cloudera/output_new
+   33  hdfs dfs -ls /user/cloudera/output_new_0
+   34  hdfs dfs -rm -rf /user/cloudera/output_new_2
+   35  hdfs dfs -rm /us
+   36  hdfs dfs -rm -r -f /user/cloudera/output_new_2
+   37  hdfs dfs -ls /user/cloudera
+   38  hdfs dfs -cat /user/cloudera/output_new_0/part-00000
+   39  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_new_2    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py    -numReduceTasks 2
+   40  hdfs dfs -ls
+   41  hdfs dfs -rm -r -f /user/cloudera/output_new_2
+   42  hdfs dfs -ls
+   43  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_new_2    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py    -numReduceTasks 2
+   44  hdfs dfs -rm -r -f /user/cloudera/output_new_2
+   45  hdfs dfs -ls
+   46  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_new_2    -mapper /home/cloudera/Desktop/R/wordcount_mapper.py    -reducer /home/cloudera/Desktop/R/wordcount_reducer.py    -numReduceTasks 2
+   47  hdfs dfs -ls
+   48  hdfs dfs -ls /user/cloudera/output_new_2
+   49  hdfs dfs -ls /user/cloudera/output_new_1
+   50  hdfs dfs -ls /user/cloudera/output_new_0
+   51  hdfs dfs -ls /user/cloudera/output_new
+   52  hdfs dfs -cat /user/cloudera/output_new_0/part-00000
+   53  hdfs dfs -cat /user/cloudera/output_new_0/part-00001
+   54  hdfs dfs -cat /user/cloudera/output_new_0/part-00002
+   55  hdfs dfs -cat /user/cloudera/output_new_0/_SUCCESS
+   56  hdfs dfs -ls /user/cloudera/output_new_0/_SUCCESS
+   57  hdfs dfs -cat /user/cloudera/output_new/part-00000
+   58  hdfs dfs -ls /user/cloudera/output_new/_SUCCESS
+   59  hdfs dfs -cat /user/cloudera/output_new/_SUCCESS
+   60  hdfs dfs -cat /user/cloudera/output_new_2/part-00000
+   61  hdfs dfs -cat /user/cloudera/output_new_2/part-00001
+   62  hdfs dfs -cat /user/cloudera/output_new_2/part-00002
+   63  hdfs dfs -cat /user/cloudera/output_new_2/_SUCCESS
+   64  hdfs dfs -ls /user/cloudera/output_new_2/_SUCCESS
+   65  hdfs dfs -ls /user/cloudera
+   66  dir
+   67  ls
+   68  python --version
+   69  chmod +x join1_mapper.py
+   70  chmod +x join1_reducer.py
+   71  cat join1_File*.txt | ./join1_mapper.py | sort | ./join1_reducer.py
+   72  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_join \   
+   73     -mapper /home/cloudera/Desktop/R/join1_mapper.py \   
+   74  hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar    -input /user/cloudera/input    -output /user/cloudera/output_join    -mapper /home/cloudera/Desktop/R/join1_mapper.py    -reducer /home/cloudera/Desktop/R/join1_reducer.py
+   75  python join1_mapper.py
+   76  echo "Hello World" | python join1_mapper.py
+   77  history
+[cloudera@quickstart R]$

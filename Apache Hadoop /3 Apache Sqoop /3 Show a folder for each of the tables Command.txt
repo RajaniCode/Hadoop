@@ -1,0 +1,1 @@
+[cloudera@quickstart ~]$ hadoop fs -ls /user/hive/warehouse/categories/

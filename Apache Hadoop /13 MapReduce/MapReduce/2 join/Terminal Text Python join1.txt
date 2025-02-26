@@ -1,0 +1,14 @@
+[rajani@localhost Lesson-2]$ cat join1_FileA1.txt | python join1_reducer.py
+[rajani@localhost Lesson-2]$ cat join1_FileB.txt | python join1_mapper.py
+able	Jan-01 5
+about	Feb-02 3
+about	Mar-03 8
+able	Apr-04 13
+actor	Feb-22 3
+burger	Feb-23 5
+burger	Mar-08 2
+able	Dec-15 100
+[rajani@localhost Lesson-2]$ python make_join2data.py 1 2 3
+Hourly_Sports,21
+Hourly_Cooking,28
+[rajani@localhost Lesson-2]$
